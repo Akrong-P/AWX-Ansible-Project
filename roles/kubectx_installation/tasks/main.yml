@@ -1,0 +1,16 @@
+---
+- name: Install dependencies for kubectx
+  apt:
+    name:
+      - bash-completion
+      - curl
+    state: present
+    update_cache: yes
+
+- name: Download and install kubectx
+  shell: |
+    git clone https://github.com/ahmetb/kubectx /opt/kubectx || true
+    ln -sf /opt/kubectx/kubectx /usr/local/bin/kubectx
+    ln -sf /opt/kubectx/kubens /usr/local/bin/kubens
+  args:
+    creates: /usr/local/bin/kubectx

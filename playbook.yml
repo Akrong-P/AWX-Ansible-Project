@@ -1,0 +1,8 @@
+---
+- name: Install kubectx and terraform on WSL host
+  hosts: all
+  become: yes
+
+  roles:
+    - install_kubectx
+    - install_terraform
