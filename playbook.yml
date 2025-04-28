@@ -4,5 +4,5 @@
   become: yes
 
   roles:
-    - install_kubectx
-    - install_terraform
+    - kubectx_installation
+    - terraform_installation

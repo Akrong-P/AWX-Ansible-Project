@@ -1,16 +1,19 @@
 ---
-- name: Install dependencies for kubectx
-  apt:
-    name:
-      - bash-completion
-      - curl
-    state: present
-    update_cache: yes
-
-- name: Download and install kubectx
-  shell: |
-    git clone https://github.com/ahmetb/kubectx /opt/kubectx || true
-    ln -sf /opt/kubectx/kubectx /usr/local/bin/kubectx
-    ln -sf /opt/kubectx/kubens /usr/local/bin/kubens
+- name: Clone the kubectx repository
+  shell: git clone https://github.com/ahmetb/kubectx /opt/kubectx
   args:
-    creates: /usr/local/bin/kubectx
+    executable: /bin/bash
+    creates: /opt/kubectx
+
+- name: Create symlink for kubectx
+  file:
+    src: /opt/kubectx/kubectx
+    dest: /usr/local/bin/kubectx
+    state: link
+
+- name: Create symlink for kubens
+  file:
+    src: /opt/kubectx/kubens
+    dest: /usr/local/bin/kubens
+    state: link
+

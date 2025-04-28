@@ -1,5 +1,14 @@
 
 ---
+- name: Install required packages for Terraform
+  apt:
+    name:
+      - gnupg
+      - software-properties-common
+      - curl
+    state: present
+    update_cache: yes
+
 - name: Add HashiCorp GPG key
   apt_key:
     url: https://apt.releases.hashicorp.com/gpg
@@ -7,12 +16,14 @@
 
 - name: Add HashiCorp repository
   apt_repository:
-    repo: "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+    repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
     state: present
-    filename: hashicorp
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
 
 - name: Install Terraform
   apt:
     name: terraform
     state: present
-    update_cache: yes
