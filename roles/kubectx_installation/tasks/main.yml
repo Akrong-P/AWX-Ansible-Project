@@ -1,19 +1,25 @@
----
 - name: Clone the kubectx repository
-  shell: git clone https://github.com/ahmetb/kubectx /opt/kubectx
-  args:
-    executable: /bin/bash
-    creates: /opt/kubectx
+  git:
+    repo: https://github.com/ahmetb/kubectx
+    dest: /opt/kubectx
+    update: no
+
+- name: Ensure /usr/local/bin directory exists
+  file:
+    path: /usr/local/bin
+    state: directory
+    mode: '0755'
 
 - name: Create symlink for kubectx
   file:
     src: /opt/kubectx/kubectx
     dest: /usr/local/bin/kubectx
     state: link
+    force: yes
 
 - name: Create symlink for kubens
   file:
     src: /opt/kubectx/kubens
     dest: /usr/local/bin/kubens
     state: link
-
+    force: yes

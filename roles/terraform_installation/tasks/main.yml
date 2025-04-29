@@ -9,19 +9,34 @@
     state: present
     update_cache: yes
 
+- name: Check if HashiCorp GPG key already exists
+  stat:
+    path: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+  register: hashicorp_key
+
 - name: Add HashiCorp GPG key
-  apt_key:
-    url: https://apt.releases.hashicorp.com/gpg
-    state: present
+  ansible.builtin.shell: |
+    curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+  when: not hashicorp_key.stat.exists
+
+- name: Check if HashiCorp repo already exists
+  ansible.builtin.shell: grep -q '^deb .*hashicorp' /etc/apt/sources.list.d/hashicorp.list
+  register: hashicorp_repo_check
+  ignore_errors: true
 
 - name: Add HashiCorp repository
-  apt_repository:
-    repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+    filename: hashicorp
     state: present
+  when: hashicorp_repo_check.rc != 0
 
 - name: Update apt cache
   apt:
     update_cache: yes
+  when: not ansible_check_mode
 
 - name: Install Terraform
   apt:
