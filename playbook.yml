@@ -3,28 +3,7 @@
   hosts: all
   become: yes
 
-  tasks:
-    - name: Ensure .ssh directory exists
-      ansible.builtin.file:
-        path: "/home/{{ ansible_user }}/.ssh"
-        state: directory
-        mode: '0700'
-
-    - name: Copy SSH private key
-      ansible.builtin.copy:
-        src: "/home/{{ ansible_user }}/.ssh/id_rsa"
-        dest: "/home/{{ ansible_user }}/.ssh/id_rsa"
-        owner: "{{ ansible_user }}"
-        mode: '0600'
-
-    - name: Ensure SSH public key is authorized
-      ansible.builtin.lineinfile:
-        path: "/home/{{ ansible_user }}/.ssh/authorized_keys"
-        line: "{{ lookup('file', '/home/{{ ansible_user }}/.ssh/id_rsa.pub') }}"
-        create: yes
-        mode: '0600'
-
   roles:
     - { role: kubectx_installation, tags: kubectx }
     - { role: terraform_installation, tags: terraform }
-    #- { role: rancher_desktop_installation, tags: rancher }
+    # - { role: rancher_desktop_installation, tags: rancher }  # only if targeting Windows
