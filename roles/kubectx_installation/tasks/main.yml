@@ -1,7 +1,20 @@
+---
+# Install required packages for kubectx
+- name: Install required packages for kubectx
+  apt:
+    name:
+      - git
+      - curl
+      - unzip
+    state: present
+    update_cache: yes
+
+# kubectx installation
 - name: Clone the kubectx repository
   git:
-    repo: https://github.com/ahmetb/kubectx
+    repo: https://github.com/ahmetb/kubectx.git
     dest: /opt/kubectx
+    version: master
     update: no
 
 - name: Ensure /usr/local/bin directory exists

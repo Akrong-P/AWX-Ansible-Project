@@ -1,44 +1,26 @@
+- name: Download Terraform binary
+  get_url:
+    url: "https://releases.hashicorp.com/terraform/1.5.5/terraform_1.5.5_linux_amd64.zip"
+    dest: "/tmp/terraform.zip"
+    mode: '0644'
 
----
-- name: Install required packages for Terraform
-  apt:
-    name:
-      - gnupg
-      - software-properties-common
-      - curl
-    state: present
-    update_cache: yes
+- name: Unzip Terraform binary
+  unarchive:
+    src: "/tmp/terraform.zip"
+    dest: "/usr/local/bin"
+    remote_src: yes
 
-- name: Check if HashiCorp GPG key already exists
-  stat:
-    path: /usr/share/keyrings/hashicorp-archive-keyring.gpg
-  register: hashicorp_key
+- name: Remove downloaded terraform.zip
+  file:
+    path: "/tmp/terraform.zip"
+    state: absent
 
-- name: Add HashiCorp GPG key
-  ansible.builtin.shell: |
-    curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-  args:
-    creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
-  when: not hashicorp_key.stat.exists
+- name: Verify Terraform installation
+  command: terraform -v
+  register: terraform_version
+  failed_when: terraform_version.rc != 0
+  changed_when: false
 
-- name: Check if HashiCorp repo already exists
-  ansible.builtin.shell: grep -q '^deb .*hashicorp' /etc/apt/sources.list.d/hashicorp.list
-  register: hashicorp_repo_check
-  ignore_errors: true
-
-- name: Add HashiCorp repository
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-    filename: hashicorp
-    state: present
-  when: hashicorp_repo_check.rc != 0
-
-- name: Update apt cache
-  apt:
-    update_cache: yes
-  when: not ansible_check_mode
-
-- name: Install Terraform
-  apt:
-    name: terraform
-    state: present
+- name: Display Terraform version
+  debug:
+    msg: "Terraform version installed: {{ terraform_version.stdout }}"
