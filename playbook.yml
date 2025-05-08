@@ -25,5 +25,6 @@
         mode: '0600'
 
   roles:
-    - kubectx_installation
-    - terraform_installation
+    - { role: kubectx_installation, tags: kubectx }
+    - { role: terraform_installation, tags: terraform }
+    #- { role: rancher_desktop_installation, tags: rancher }

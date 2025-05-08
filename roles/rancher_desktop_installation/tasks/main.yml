@@ -1,0 +1,17 @@
+---
+- name: Download Rancher Desktop
+  win_get_url:
+    url: "https://github.com/rancher-sandbox/rancher-desktop/releases/download/v1.18.2/Rancher.Desktop.Setup.1.18.2.msi"
+    dest: "C:\\Users\\{{ ansible_user }}\\Downloads\\Rancher.Desktop.Setup.1.18.2.msi"
+  tags: rancher
+
+- name: Install Rancher Desktop
+  win_package:
+    path: "C:\\Users\\{{ ansible_user }}\\Downloads\\Rancher.Desktop.Setup.1.18.2.msi"
+    state: present
+  tags: rancher
+
+- name: Configure Kubernetes in Rancher Desktop
+  win_shell: '"C:\\Program Files\\Rancher Desktop\\rancher-desktop.exe" --enable-kubernetes --container-runtime dockerd'
+  tags: rancher
+
